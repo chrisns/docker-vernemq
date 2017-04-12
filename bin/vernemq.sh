@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-IP_ADDRESS=$(getent hosts $(hostname) | awk '{ print $1 }' | head -n 1)
+IP_ADDRESS=$(awk 'FNR==NR{a[$1];next}($1 in a){print}'  <(getent hosts $(hostname) | awk '{ print $1 }') <(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }'))
 
 # Ensure correct ownership and permissions on volumes
 chown vernemq:vernemq /var/lib/vernemq /var/log/vernemq
