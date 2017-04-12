@@ -64,12 +64,12 @@ trap 'kill ${!}; sigterm_handler' SIGTERM
 pid=$(vernemq getpid)
 
 if env | grep -q "DOCKER_VERNEMQ_DISCOVERY_NODE"; then
-    wait-for-it.sh ${IP_ADDRESS}:44053 ${DOCKER_VERNEMQ_DISCOVERY_NODE}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${DOCKER_VERNEMQ_DISCOVERY_NODE}
+    wait-for-it.sh -t 60 ${IP_ADDRESS}:44053 ${DOCKER_VERNEMQ_DISCOVERY_NODE}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${DOCKER_VERNEMQ_DISCOVERY_NODE}
 fi
 
 if env | grep -q "PEER_DISCOVERY_NAME"; then
     FIRST_PEER=$(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }' | sort | grep -v ${IP_ADDRESS} | head -n 1)
-    wait-for-it.sh ${IP_ADDRESS}:44053 ${FIRST_PEER}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${FIRST_PEER}
+    wait-for-it.sh -t 120 ${IP_ADDRESS}:44053 ${FIRST_PEER}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${FIRST_PEER}
 fi
 
 
