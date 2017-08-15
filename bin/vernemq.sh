@@ -29,6 +29,11 @@ sleep 30
 
 IP_ADDRESS=$(awk 'FNR==NR{a[$1];next}($1 in a){print}'  <(getent hosts $(hostname) | awk '{ print $1 }') <(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }'))
 
+# if we have a PEER_DISCOVERY_NAME we can make a better guess at the right IP to use
+if env | grep -q "PEER_DISCOVERY_NAME"; then
+  IP_ADDRESS= $(getent hosts $(hostname) | grep $(getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3). | awk '{print $1}')
+fi
+
 # Ensure correct ownership and permissions on volumes
 chown vernemq:vernemq /var/lib/vernemq /var/log/vernemq
 chmod 755 /var/lib/vernemq /var/log/vernemq
@@ -94,10 +99,6 @@ trap 'kill ${!}; sigterm_handler' SIGTERM
 
 /usr/sbin/vernemq start
 pid=$(vernemq getpid)
-
-if env | grep -q "DOCKER_VERNEMQ_DISCOVERY_NODE"; then
-    wait-for-it.sh -t 60 ${IP_ADDRESS}:44053 ${DOCKER_VERNEMQ_DISCOVERY_NODE}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${DOCKER_VERNEMQ_DISCOVERY_NODE}
-fi
 
 if env | grep -q "PEER_DISCOVERY_NAME"; then
     FIRST_PEER=$(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }' | sort -V | grep -v ${IP_ADDRESS} | head -n 1)
