@@ -27,7 +27,7 @@ fi
 # slow down startup
 sleep 45
 
-IP_ADDRESS=$(awk 'FNR==NR{a[$1];next}($1 in a){print}'  <(getent hosts $(hostname) | awk '{ print $1 }') <(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }'))
+IP_ADDRESS=no$(awk 'FNR==NR{a[$1];next}($1 in a){print}'  <(getent hosts $(hostname) | awk '{ print $1 }') <(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }'))
 
 echo found ${IP_ADDRESS}
 
