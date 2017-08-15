@@ -5,6 +5,10 @@ if [ -f "/data/vm.args" ]; then
   cp -v /data/vm.args /etc/vernemq/
 fi
 
+if [ -f "/data/vm.args" ]; then
+  cp -v /data/vm.args /etc/vernemq/
+fi
+
 if [ -f "/data/vernemq.conf" ]; then
   cp -v /data/vernemq.conf /etc/vernemq/
 fi
@@ -13,6 +17,12 @@ fi
 if [ -f "/data/vmq.acl" ]; then
   ln -svf /data/vmq.acl /etc/vernemq/vmq.acl
 fi
+
+# if passwd has been mounted as a volume symlink it in
+if [ -f "/data/vmq.passwd" ]; then
+  ln -svf /data/vmq.passwd /etc/vernemq/vmq.passwd
+fi
+
 
 # slow down startup
 sleep 30
