@@ -27,21 +27,9 @@ fi
 # slow down startup
 sleep 45
 
-IP_ADDRESS=no$(awk 'FNR==NR{a[$1];next}($1 in a){print}'  <(getent hosts $(hostname) | awk '{ print $1 }') <(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }'))
+IP_ADDRESS=$(getent hosts $(hostname) | grep $(getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3). | awk '{print $1}')
 
 echo found ${IP_ADDRESS}
-
-# if we have a PEER_DISCOVERY_NAME we can make a better guess at the right IP to use
-if env | grep -q "PEER_DISCOVERY_NAME"; then
-  getent hosts tasks.${PEER_DISCOVERY_NAME}
-  echo "ff"
-  getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3
-  echo "aa"
-  echo getent hosts $(hostname)
-  IP_ADDRESS=$(getent hosts $(hostname) | grep $(getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3). | awk '{print $1}')
-  echo found ${IP_ADDRESS} instead
-fi
-
 
 # Ensure correct ownership and permissions on volumes
 chown vernemq:vernemq /var/lib/vernemq /var/log/vernemq
