@@ -65,8 +65,13 @@ siguser1_handler() {
 sigterm_handler() {
     if [ $pid -ne 0 ]; then
         # this will stop the VerneMQ process
-        vmq-admin cluster leave node=VerneMQ@$IP_ADDRESS -k > /dev/null
-        wait "$pid"
+        vmq-admin cluster leave node=VerneMQ@${IP_ADDRESS} -k > /dev/null
+        while [[ -d /proc/${pid} ]]
+        do
+          echo "waiting for clean shutdown"
+          sleep 1
+        done
+        echo "shutdown cleanly"
     fi
     exit 143; # 128 + 15 -- SIGTERM
 }
@@ -85,21 +90,9 @@ if env | grep -q "DOCKER_VERNEMQ_DISCOVERY_NODE"; then
 fi
 
 if env | grep -q "PEER_DISCOVERY_NAME"; then
-    FIRST_PEER=$(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }' | sort | grep -v ${IP_ADDRESS} | head -n 1)
+    FIRST_PEER=$(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }' | sort -V | grep -v ${IP_ADDRESS} | head -n 1)
     wait-for-it.sh -t 120 ${IP_ADDRESS}:44053 ${FIRST_PEER}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${FIRST_PEER}
 fi
-
-
-# remove any nodes that go offline from the cluster since the swarm will bring them back with a new identity
-while true
-do
-  DEAD_NODE=$(vmq-admin cluster show | grep false | awk '{ print $1 }' | sed -e 's/|//g' | head)
-  if [[ $DEAD_NODE ]]; then
-    echo killing $DEAD_NODE
-    vmq-admin cluster leave node=${DEAD_NODE} -k -t 1 -i 1
-  fi
-  sleep 5
-done &
 
 
 while true
