@@ -76,6 +76,18 @@ if env | grep -q "PEER_DISCOVERY_NAME"; then
 fi
 
 
+# remove any nodes that go offline from the cluster since the swarm will bring them back with a new identity
+while true
+do
+  DEAD_NODE=$(vmq-admin cluster show | grep false | awk '{ print $1 }' | sed -e 's/|//g' | head)
+  if [[ $DEAD_NODE ]]; then
+    echo killing $DEAD_NODE
+    vmq-admin cluster leave node=${DEAD_NODE} -k -t 1 -i 1
+  fi
+  sleep 5
+done &
+
+
 while true
 do
     tail -f /var/log/vernemq/console.log & wait ${!}
