@@ -35,7 +35,7 @@ echo found ${IP_ADDRESS}
 if env | grep -q "PEER_DISCOVERY_NAME"; then
   getent hosts tasks.${PEER_DISCOVERY_NAME}
   echo "ff"
-  echo getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3
+  getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3
   echo "aa"
   echo getent hosts $(hostname)
   IP_ADDRESS=$(getent hosts $(hostname) | grep $(getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3). | awk '{print $1}')
