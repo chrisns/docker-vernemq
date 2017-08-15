@@ -15,7 +15,7 @@ if [ -f "/data/vmq.acl" ]; then
 fi
 
 # slow down startup
-sleep 5
+sleep 30
 
 IP_ADDRESS=$(awk 'FNR==NR{a[$1];next}($1 in a){print}'  <(getent hosts $(hostname) | awk '{ print $1 }') <(getent hosts tasks.${PEER_DISCOVERY_NAME} | awk '{ print $1 }'))
 
@@ -94,8 +94,4 @@ if env | grep -q "PEER_DISCOVERY_NAME"; then
     wait-for-it.sh -t 120 ${IP_ADDRESS}:44053 ${FIRST_PEER}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${FIRST_PEER}
 fi
 
-
-while true
-do
-    tail -f /var/log/vernemq/console.log & wait ${!}
-done
+tail -f /var/log/vernemq/console.log
