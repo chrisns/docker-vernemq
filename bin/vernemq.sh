@@ -31,7 +31,7 @@ IP_ADDRESS=$(awk 'FNR==NR{a[$1];next}($1 in a){print}'  <(getent hosts $(hostnam
 
 # if we have a PEER_DISCOVERY_NAME we can make a better guess at the right IP to use
 if env | grep -q "PEER_DISCOVERY_NAME"; then
-  IP_ADDRESS= $(getent hosts $(hostname) | grep $(getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3). | awk '{print $1}')
+  IP_ADDRESS=$(getent hosts $(hostname) | grep $(getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3). | awk '{print $1}')
 fi
 
 # Ensure correct ownership and permissions on volumes
