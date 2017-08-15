@@ -33,6 +33,11 @@ echo found ${IP_ADDRESS}
 
 # if we have a PEER_DISCOVERY_NAME we can make a better guess at the right IP to use
 if env | grep -q "PEER_DISCOVERY_NAME"; then
+  getent hosts tasks.${PEER_DISCOVERY_NAME}
+  echo "ff"
+  echo getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3
+  echo "aa"
+  echo getent hosts $(hostname)
   IP_ADDRESS=$(getent hosts $(hostname) | grep $(getent hosts tasks.${PEER_DISCOVERY_NAME} | head -n 1 |  cut -d"." -f1-3). | awk '{print $1}')
   echo found ${IP_ADDRESS} instead
 fi
