@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# if config has been mounted as a volume copy that in
+if [ -f "/data/vm.args" ]; then
+  cp -v /data/vm.args /etc/vernemq/
+fi
+
+if [ -f "/data/vernemq.conf" ]; then
+  cp -v /data/vernemq.conf /etc/vernemq/
+fi
+
+# if acl has been mounted as a volume symlink it in
+if [ -f "/data/vmq.acl" ]; then
+  ln -svf /data/vmq.acl /etc/vernemq/vmq.acl
+fi
+
 # slow down startup
 sleep 5
 
