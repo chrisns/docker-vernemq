@@ -102,4 +102,6 @@ if env | grep -q "PEER_DISCOVERY_NAME"; then
     wait-for-it.sh -t 120 ${IP_ADDRESS}:44053 ${FIRST_PEER}:44053 && vmq-admin cluster join discovery-node=VerneMQ@${FIRST_PEER}
 fi
 
+/usr/sbin/kill-dead &
+
 tail -f /var/log/vernemq/console.log
